@@ -1,11 +1,18 @@
 const mongoose = require("mongoose")
+const config = require("config")
+require('dotenv').config();
+
+const dbgr = require("debug")("development:mongoose")
+
 
 mongoose
-.connect("mongodb://localhost:27017/Scatch")   // baad mein dynamically link put karege
+.connect(`${config.get("MONGODB_URI")}/scatch`)   // baad mein dynamically link put karege
 .then((result) => {
-    console.log("connected to database")
+    console.log("Connected to the database");
+    // dbgr("Connected to the database");
 }).catch((err) => {
-    // console.log("Error occured")
+    console.log("Error occurred:", err);
+    // dbgr("Error occurred: ", err);
 });
 
 module.exports = mongoose.connection;
