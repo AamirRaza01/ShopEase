@@ -1,31 +1,33 @@
 const express = require("express");
 const router = express.Router();
-const ownerModel = require("../models/owner");
+const isOwnerLoggedIn = require("../middlewares/isOwnerLoggedIn");
 
-router.post("/create", async function (req, res) {
-  try {
-    let owners = await ownerModel.find();
-    if (owners.length > 0) {
-      return res.status(503).send("Not authorized to create owner");
-    }
+const bcrypt = require("bcrypt")
+const {generateToken} = require("../utils/generateToken");
+const { createOwner, loginOwner, logOutOwner } = require("../controllers/ownerAuthController");
 
-    const { fullName, email, password } = req.body;
+router.get("/", function(req, res){
+  let error = req.flash("error1")
+  res.render("createOwner", {error})
+})
 
-    let createdOwner = await ownerModel.create({
-      fullName,
-      email,
-      password
-    });
-  
-    res.status(203).send(createdOwner);
+router.get("/login", function(req, res){
+  let incorrectCredentialError = req.flash("error2")
+  let withoutLoginAccess = req.flash("error")
+  let ownerCreationSuccess = req.flash("success")
+  res.render("owner-login", {incorrectCredentialError, ownerCreationSuccess, withoutLoginAccess })
+})
 
-  } catch (error) {
-    res.send(error.message);
-  }
-});
+router.post("/create", createOwner);
 
-router.get("/", function (req, res) {
-  res.send("working owner page");
+router.post("/login", loginOwner);
+
+router.get("/logout", isOwnerLoggedIn, logOutOwner  )
+
+
+router.get("/addproducts", isOwnerLoggedIn, function (req, res) {
+  let success = req.flash("success")
+  res.render("createproducts", {success});
 });
 
 module.exports = router;

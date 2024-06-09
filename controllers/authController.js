@@ -1,4 +1,5 @@
 const userModel = require("../models/user");
+const productModel = require("../models/product");
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const {generateToken} = require("../utils/generateToken")
@@ -26,12 +27,10 @@ module.exports.registerUser  = async function(req, res){
             
             let token  = generateToken(createdUser);
             res.cookie("token", token)
-            // res.send("User created successfully")
+            res.redirect("/shop")
           }
         })
       })
-      
-  
       
     } catch (error) {
       res.send(error.message)
@@ -45,16 +44,27 @@ module.exports.registerUser  = async function(req, res){
         let foundUser = await userModel.findOne({email});
         if(!foundUser) return res.status(404).send("Email or password incorrect")
 
-        bcrypt.compare(password, foundUser.password, function(err, result){
+        bcrypt.compare(password, foundUser.password, async function(err, result){
             if(result){
                 let token  = generateToken(foundUser);
                 res.cookie("token", token)
-                res.send("You can login")
+                // res.send("You can login")
+                res.redirect("/shop")
             }else{
-                return res.status(404).send("Email or password incorrect")
+                req.flash("error", "Email or password incorrect")
+                return res.redirect("/")
             }
         })    
     } catch (error) {
         res.send(error.message)
+    }
+  }
+
+  module.exports.logOutUser =  function(req, res){
+    try {
+      res.cookie("token", "")
+      res.redirect("/")
+    } catch (error) {
+      res.status(501).send(error.message)
     }
   }
