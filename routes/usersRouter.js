@@ -15,4 +15,13 @@ router.post("/login", loginUser )
 
 router.get("/logout", isLoggedIn, logOutUser )
 
+router.get("/mycart", isLoggedIn, async function(req, res){
+  try {
+      let user = await userModel.findOne({ email: req.user.email }).populate("cart")
+      res.render("mycart", {user})
+  } catch (error) {
+      res.send(error.message)
+  }
+})
+
 module.exports = router;

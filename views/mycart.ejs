@@ -1,0 +1,23 @@
+<%- include('./partials/header') %>
+<div class="container mx-auto my-10 px-16">
+    <h1 class="text-2xl font-semibold mb-4">My Cart</h1>
+    <ul class="bg-white shadow-md rounded-lg">
+        <% if (user.cart.length > 0) { %>
+            <% user.cart.forEach(product => { %>
+                <li class="flex items-center p-4 border-b last:border-none hover:bg-gray-300">
+                    <img class="h-16 w-16 object-cover rounded-full" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
+                    <div class="ml-4 flex-grow">
+                        <div class="text-lg font-semibold"><%= product.name %></div>
+                        <div class="text-gray-600">Rs.<%= product.price %></div>
+                    </div>
+                    <form action="/remove-from-cart/<%= product._id %>" method="POST" class="ml-4">
+                        <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Remove</button>
+                    </form>
+                </li>
+            <% }) %>
+        <% } else { %>
+            <li class="p-4 text-center text-gray-600">Add products to view in cart.</li>
+        <% } %>
+    </ul>
+</div>
+<%- include('./partials/footer') %>
